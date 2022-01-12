@@ -1,4 +1,4 @@
-# Litecoin and some scripts
+# Litecoin on Docker and k8s, some scripts and a terraform module
 Adapted from:
  - https://raw.githubusercontent.com/domyrtille/interview_project/main/README.md
  - https://raw.githubusercontent.com/kenan3008/litecoin/main/README.md
