@@ -1,14 +1,12 @@
-############################################################################################################
-## Dockerfile adapted from
-## https://raw.githubusercontent.com/domyrtille/interview_project/main/Dockerfile
-############################################################################################################
+# Inspired from
+# https://raw.githubusercontent.com/domyrtille/interview_project/main/Dockerfile
+# https://raw.githubusercontent.com/airstand/litecoin/master/Dockerfile
 
 # Latest version pinned to avoid issues by using latest
 FROM alpine:3.13.6 as base
 
-LABEL maintainer="Ben Cyril"
-# ARG are used for build and won't be present in the final container
-# Latest litecoin version / October 2021
+LABEL maintainer="csr"
+
 ARG LITECOIN_VERSION=0.18.1
 ARG VERIF="GOODSIG"
 # Fingerpint given by Litecoin dev to check authenticity
@@ -52,12 +50,9 @@ RUN tar --strip=2 -xzvf \
 # Ubuntu Focal release allows for End of Support on April 2025
 FROM ubuntu:focal-20210921
 
-LABEL maintainer="Ben Cyril"
-ENV LITECOIN_DATA=/litecoin/.litecoin
-ARG LITECOIN_USER="litecoin"
-ARG LITECOIN_GROUP="litecoin"
+LABEL maintainer="csr"
+
 ARG LITECOIN_USER_UID="10001"
-ARG LITECOIN_GROUP_GID="10001"
 
 # Update to patch any released security issues
 RUN apt-get update && apt-get upgrade -y \
@@ -66,16 +61,19 @@ RUN apt-get update && apt-get upgrade -y \
 
 # Create the user litecoin
 # For security reason we remove the login and /etc/passwd informations(--gecos)
-RUN mkdir /litecoin \
-    && adduser --home /litecoin --shell /sbin/nologin --gecos '' --no-create-home --disabled-password --uid 10001 litecoin \
-    && chown -R litecoin /litecoin 
+RUN adduser --shell /sbin/nologin --gecos '' --disabled-password --uid ${LITECOIN_USER_UID} litecoin
 
 # We copy the binaries from the other build to /usr/local/bin/ with specific permissions
-COPY --chown=root:${LITECOIN_GROUP} --chmod=0450 --from=base /tmp/ /usr/local/bin/
+COPY --from=base /tmp/ /usr/local/bin/
 
-WORKDIR /litecoin
+VOLUME ["/home/litecoin"]
+
+WORKDIR /home/litecoin
 
 # Run as the "litecoin" user, not root
-USER litecoin
+USER ${LITECOIN_USER_UID}
+
+EXPOSE 9332 9333
 
 CMD ["litecoind"]
+

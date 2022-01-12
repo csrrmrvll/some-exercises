@@ -1,0 +1,107 @@
+# Inspired from
+# https://github.com/domyrtille/interview_project/blob/main/kube/ltc_statefulset.yaml
+# https://github.com/airstand/litecoin/blob/master/statefulset.yaml
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: litecoin-pv
+  labels:
+    type: local
+spec:
+  #storageClassName: local-storage
+  storageClassName: standard
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath: 
+    path: /data/litecoin-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: litecoin-pvc
+spec:
+  #storageClassName: local-storage
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: litecoin-pv
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: litecoin-svc
+  labels:
+    app: litecoin-svc
+spec:
+  ports:
+  - port: 8333
+    name: ltc
+  clusterIP: None
+  selector:
+    app: litecoin-svc
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: default 
+  name: litecoin-node
+  labels:
+    app: litecoin-node
+    version: '0.18.1'
+spec:
+  serviceName: litecoin-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: litecoin
+  template:
+    metadata:
+      labels:
+        app: litecoin
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 10001
+      volumes:
+      - name: data-node-ltc
+        persistentVolumeClaim:
+          claimName: litecoin-pvc
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: litecoin
+        image: c3542/litecoin:0.18.1
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 0.5
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 512Mi
+        readinessProbe:
+          tcpSocket:
+            port: ltc-port
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        ports:
+          - name: ltc-port
+            containerPort: 9333
+          - name: ltc-rpc
+            containerPort: 9332
+          - name: ltc-testnet
+            containerPort: 19335
+          - name: ltc-testnet-rpc
+            containerPort: 19332
+        volumeMounts:
+        - mountPath: /litecoin
+          name: data-node-ltc
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+
