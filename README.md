@@ -2,6 +2,7 @@
 Adapted from:
  - https://raw.githubusercontent.com/domyrtille/interview_project/main/README.md
  - https://raw.githubusercontent.com/kenan3008/litecoin/main/README.md
+ - https://raw.githubusercontent.com/airstand/litecoin/master/README.md
 
 ## Docker-ayes
 
@@ -14,33 +15,27 @@ Container is scanned for vulnerabilities using Anchore. To get it up and running
 ## k8s FTW
 he [statefulset](https://github.com/csrrmrvll/some-exercises/blob/main/kube/litecoin-statefulset.yaml) has multiple objects appart from the statefulset like PV, PVC and a headless service. The statefulset has been applied to minikube with a 2Gb PV just as a test.
 
-## Gitlab pipeline
+## Jenkinsfile
 
-Gitlab pipeline is available in the `.gitlab-ci.yaml` file. It contains two stages: `build` and `deploy`.
-`build` stage builds the docker container and pushes it to the dockerhub registry.
-`deploy` stage deploys the latest image to a staging cluster using the helm chart and `latest` image tag.
-
-A better approach could be to build a new version of the helm chart along with a new image, push it to some registry and then deploy this helm chart referencing the correct image tag to staging.
-Another solution could utilize GitOps approach and ArgoCD. Gitlab pipeline would make the necessary changes to a particular git repository monitored by ArgoCD. ArgoCD would then detect this change and make the necessary adjustments in the cluster.
+This is a very simple Jenkinsfile using Groovy DSL using my own repo/registry and my minikube kube-config as parameters.
 
 ## Script kiddies
 
-Task: List of all users is available in the file `/etc/passwd`. Get username and home path of a user with ID `1000` .
+Task: List of all users is available in the file `/etc/passwd`. Substitute the ID `1000` by `mask-uid`, find the line and get username and home path of that user.
 
 Solution:
 
 ```
-cat /etc/passwd | grep 1000 | awk -F':' '{print $1}'
+cat /etc/passwd | sed 's/1000/mask-uid/g' | grep match-me | awk -F':' '{print $1}'
 
-cat /etc/passwd | grep 1000 | awk -F':' '{print $6}'
+cat /etc/passwd | sed 's/1000/mask-uid/g' | grep match-me | awk -F':' '{print $6}'
 ```
 
 `cat /etc/passwd` prints out the whole content of the `etc/passwd`
-`grep 1000` selects the line with the user id equal to 1000.
-`awk -F':' '{print $1}'` defines `:` to be the delimiter, then selects the first field and outputs it.
-`awk -F':' '{print $6}'` defines `:` to be the delimiter, then selects the sixth field and outputs it.
-
-Content of the file used for testing is in the `etc_passwd_example` file.
+`sed 's/1000/mask-uid/g'` substitutes the ID `1000` by `mask-uid`
+`grep 1000` selects the line with the user id equal to `mask-uid`
+`awk -F':' '{print $1}'` defines `:` to be the delimiter, then selects the first field and outputs it
+`awk -F':' '{print $6}'` defines `:` to be the delimiter, then selects the sixth field and outputs it
 
 ## Script grown-ups
 
@@ -61,10 +56,9 @@ optional arguments:
   --uid uid   uid of the user
 ```
 
-
-Content of the file used for testing is in the `etc_passwd_example` file.
-
 ## Terraform
+
+Borrowed from [kenan3008/litecoin/terraform](https://github.com/kenan3008/litecoin/tree/main/terraform)
 
 Be sure to define a profile `tf-devops-dev` in your credentials, to be able to run this code.
 
