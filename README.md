@@ -6,14 +6,14 @@ Adapted from:
 
 ## Docker-ayes
 
-Buit docker container can be retrieved by executing `docker pull c3542/litecoin:0.18.1`
+Built docker container can be retrieved by executing `docker pull c3542/litecoin:0.18.1`
 
 [Dockerfile](https://github.com/csrrmrvll/some-exercises/blob/main/Dockerfile) contains a multi-stage dockerfile to build an image of a container with the `litecoin` binary with gpg keys and sha checksums verfication. It runs as a non-root user
 
 Container is scanned for vulnerabilities using Anchore. To get it up and running locally, use [this](https://engine.anchore.io/docs/quickstart/) guide. At the time of the writing of this document, there was no vulnerabilities.
 
 ## k8s FTW
-he [statefulset](https://github.com/csrrmrvll/some-exercises/blob/main/kube/litecoin-statefulset.yaml) has multiple objects appart from the statefulset like PV, PVC and a headless service. The statefulset has been applied to minikube with a 2Gb PV just as a test.
+The [statefulset](https://github.com/csrrmrvll/some-exercises/blob/main/kube/litecoin-statefulset.yaml) has multiple objects appart from the statefulset like PV, PVC and a headless service. The statefulset has been applied to minikube with a 2Gb PV just as a test.
 
 ## Jenkinsfile
 
@@ -26,9 +26,9 @@ Task: List of all users is available in the file `/etc/passwd`. Substitute the I
 Solution:
 
 ```
-cat /etc/passwd | sed 's/1000/mask-uid/g' | grep match-me | awk -F':' '{print $1}'
+cat /etc/passwd | sed 's/1000/mask-uid/g' | grep mask-uid | awk -F':' '{print $1}'
 
-cat /etc/passwd | sed 's/1000/mask-uid/g' | grep match-me | awk -F':' '{print $6}'
+cat /etc/passwd | sed 's/1000/mask-uid/g' | grep mask-uid | awk -F':' '{print $6}'
 ```
 
 `cat /etc/passwd` prints out the whole content of the `etc/passwd`
