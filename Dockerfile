@@ -33,7 +33,7 @@ RUN gpg --verify litecoin-${LITECOIN_VERSION}-linux-signatures.asc || exit 1
 # Verify the tar.gz via the signature
 # Will use the sha256 of the tar.gz and check if it's in the linux signature file (exit if it fails)
 # SHELL is used and needed due to the complex command
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN grep -q "$(sha256sum litecoin-${LITECOIN_VERSION}-x86_64-linux-gnu.tar.gz | awk '{ print $1 }')" litecoin-${LITECOIN_VERSION}-linux-signatures.asc || exit 1
 
 # We untar the gzip file and put all binaries in /tmp
